@@ -15,11 +15,11 @@ app.use(express.json());
 
 const bcrypt = require("bcrypt");
 // Static directory
-// app.use(express.static('public'));
+app.use(express.static('public'));
 
-// var exphbs = require('express-handlebars');
-// app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
-// app.set('view engine', 'handlebars');
+var exphbs = require('express-handlebars');
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
 
 const session = require('express-session')
 
@@ -34,7 +34,18 @@ app.use(session({
 }))
 
 app.get('/', (req, res) => {
-    res.send('Hello World');
+    db.Turtle.findAll({
+        include:[db.User]
+    }).then(turtles=>{
+        const turtlesJson = turtles.map(turtObj=>{
+            return turtObj.toJSON()
+        })
+        console.log(turtlesJson)
+        const hbsObj = {
+            turtles:turtlesJson
+        }
+        res.render("index",hbsObj);
+    })
 })
 
 app.post('/signup', (req, res) => {
@@ -63,7 +74,7 @@ app.post('/login', (req, res) => {
                 email: user.email,
                 id: user.id
             }
-            return res.status(200).json(req.session)
+            return res.redirect("/myprofile")
         }
         else {
             req.session.destroy();
@@ -84,9 +95,54 @@ app.get("/sessiondata", (req, res) => {
     res.json(req.session)
 })
 
-app.get('/logout',(req,res)=>{
+app.get('/logout', (req, res) => {
     req.session.destroy();
     res.send('logged out')
+})
+
+app.get("/api/turtles", (req, res) => {
+    db.Turtle.findAll().then(turtles => {
+        res.json(turtles)
+    })
+})
+
+app.post("/api/turtles", (req, res) => {
+    if (req.session.user) {
+        db.Turtle.create({
+            name: req.body.name,
+            isTeenageMutantNinja: req.body.isTeenageMutantNinja,
+            age: req.body.age,
+            UserId: req.session.user.id
+        }).then(newTurtle => {
+            res.json(newTurtle)
+        }).catch(err => {
+            console.log(err);
+            res.status(500).end();
+        })
+    } else {
+        res.status(401).send("login first you knucklehead")
+    }
+})
+
+app.get("/login",(req,res)=>{
+    res.render("login")
+})
+
+
+app.get('/myprofile',(req,res)=>{
+    if (req.session.user) {
+       db.User.findOne({
+           where:{
+               id:req.session.user.id
+           },
+           include:[db.Turtle]
+       }).then(userData=>{
+           const userDataJSON = userData.toJSON()
+           res.render('profile',userDataJSON)
+       })
+    } else {
+        res.redirect("/login")
+    }
 })
 
 db.sequelize.sync({ force: false }).then(function () {
