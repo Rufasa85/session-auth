@@ -1,0 +1,10 @@
+<h1>Edit {{turtle.name}}</h1>
+
+
+<form id="editTurtleForm">
+    <input type="text" value={{turtle.name}} id = "editTurtleName" placeholder="name">
+    <input type="text" value={{turtle.age}} id = "editTurtleAge" placeholder="age">
+    <input type="text" value={{turtle.isTeenageMutantNinja}} id = "editTurtleMutant" placeholder="is this a ninja turtle?">
+    <input type="hidden" id="editTurtleId" value={{turtle.id}}>
+    <input type="submit" value="edit turtle">
+</form>

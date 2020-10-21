@@ -1,9 +1,13 @@
-<h1>Welcome to your page, {{email}}</h1>
+<h1>Welcome to your page, {{user.email}}</h1>
+<a href="/newturtle"><button>Add a turtle!</button></a>
+<br>
+{{#each user.Turtles}}
+<div class="card">
 
-{{#each Turtles}}
     <h3>{{name}}</h3>
-    <h3>Owner: {{User.email}}</h3>
     <h3>age: {{age}}</h3>
     <h3>Fights the Foot Clan?:  {{isTeenageMutantNinja}}</h3>
-    <hr>
+    <a href="/turtles/edit/{{id}}"><button>Edit</button></a> <button class="delTurtleBtn" data-turtleid={{id}}> Delete</button>
+</div>
+    
 {{/each}}

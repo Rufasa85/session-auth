@@ -1,9 +1,10 @@
 <h1>Handlebars homepage</h1>
 
 {{#each turtles}}
+<div class="card">
     <h3>{{name}}</h3>
     <h3>Owner: {{User.email}}</h3>
     <h3>age: {{age}}</h3>
     <h3>Fights the Foot Clan?:  {{isTeenageMutantNinja}}</h3>
-    <hr>
+</div>
 {{/each}}
